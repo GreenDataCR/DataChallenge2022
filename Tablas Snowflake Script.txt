@@ -1,0 +1,474 @@
+use warehouse clima; 
+use CHA2022;
+use schema public;
+
+
+#crear tabla RESIDENCIAL 
+create or replace table Residencial(
+YEAR decimal,
+Urbano decimal(14,2),
+Rural decimal(14,2)); 
+
+#Copiarlos datos a la tabla Residencial  
+copy into Residencial
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Residencial.*[.]csv.gz') t);
+
+select * from Residencial;
+describe table Residencial; 
+
+#crear tabla oferta 
+create or replace table oferta(
+YEAR decimal,
+TRANSFERENCIAS decimal(14,2),
+PRODUCCION decimal(14,2),
+IMPORTACION decimal(14,2),
+EXPORTACION decimal(14,2),
+VarINVENTARIO decimal(14,2),
+NoAPROVECHADA decimal(14,2), 
+OfertaINTERNA decimal(14,2)); 
+
+#Copiarlos datos a la tabla oferta 
+copy into OFERTA
+from (SELECT t.$1,t.$2,replace(t.$3,',',''),replace(t.$4,',',''),replace(t.$5,',',''),
+replace(t.$6,',',''),replace(t.$7,',',''),replace(t.$8,',','') 
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Oferta.*[.]csv.gz') t);
+
+select * from OFERTA;
+
+describe table OFERTA;
+
+
+#crear tabla Centros de transf por sector
+create or replace table Centrosdetransfporsector(
+    YEAR decimal,
+    CARBONERAS decimal(14,2),
+    REFINERIAS decimal(14,2),
+    CENTRALES_ELECTRICAS_SECTOR_PUBLICO decimal(14,2),
+    CENTRALES_ELECTRICAS_SECTOR_PRIVADO decimal(14,2),
+    DESTILERIAS decimal(14,2)); 
+
+#Copiar los datos a la tabla Centros de transf por sector 
+copy into Centrosdetransfporsector
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',',''),replace(t.$4,',',''),replace(t.$5,',',''),replace(t.$6,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Centrosdetransfporsector.*[.]csv.gz') t);
+
+select * from Centrosdetransfporsector
+
+
+#crear tabla Industria
+create or replace table Industria(
+    YEAR numeric(4,0),
+    Produc_de_alimentos_y_tabaco decimal(14,2),
+    Produc_de_textiles_y_cuero decimal(14,2),
+    Produc_de_madera decimal(14,2),
+    Produc_de_papel decimal(14,2),
+    Produc_de_quimicos decimal(14,2),
+    Otras_industrias decimal(14,2)); 
+
+#Copiar los datos a la tabla Industria 
+copy into Industria
+from (SELECT t.$1, replace(t.$2,',',''), replace(t.$3,',',''), replace(t.$4,',',''), replace(t.$5,',',''), replace(t.$6,',',''), replace(t.$7,',','')
+      FROM @datosext (file_format => 'INDUSTRIA_FORMAT', pattern=>'.*Industria.*[.]csv.gz') t);
+
+select * from Centrosdetransfporsector
+
+
+
+##crear tabla Centros de transformacion 
+create or replace table CENTROS_DE_TRANSFORMACION(
+    DESCRIPCION varchar(100),
+    "2010" decimal(14,2),
+    "2011" decimal(14,2),
+    "2012" decimal(14,2),
+    "2013" decimal(14,2),
+    "2014" decimal(14,2),
+    "2015" decimal(14,2),
+    "2016" decimal(14,2),
+    "2017" decimal(14,2),
+    "2018" decimal(14,2)); 
+
+#Copiar los datos a la tabla Centros de transformacion 
+copy into CENTROS_DE_TRANSFORMACION
+from (SELECT t.$1,replace(replace(t.$2,',',''),'-',0),replace(replace(t.$3,',',''),'-',0),replace(replace(t.$4,',',''),'-',0),replace(replace(t.$5,',',''),'-',0),
+      replace(replace(t.$6,',',''),'-',0),replace(replace(t.$7,',',''),'-',0),replace(replace(t.$8,',',''),'-',0),replace(replace(t.$9,',',''),'-',0),
+      replace(replace(t.$10,',',''),'-',0)
+      FROM @datosext (file_format => 'CENTROSDETRANSFORMACION_FORMAT', pattern=>'.*Centrosdetransformacion.*[.]csv.gz') t);
+
+
+
+##crear tabla CUNSUMO FINAL 
+create or replace table CONSUMO_FINAL(
+    DESCRIPCION varchar(100),
+    "2010" decimal(14,2),
+    "2011" decimal(14,2),
+    "2012" decimal(14,2),
+    "2013" decimal(14,2),
+    "2014" decimal(14,2),
+    "2015" decimal(14,2),
+    "2016" decimal(14,2),
+    "2017" decimal(14,2),
+    "2018" decimal(14,2)); 
+
+#Copiarlos datos a la CONSUMO_FINAL  
+copy into  CONSUMO_FINAL
+from (SELECT t.$1,replace(replace(t.$2,',',''),'-',0),replace(replace(t.$3,',',''),'-',0),replace(replace(t.$4,',',''),'-',0),replace(replace(t.$5,',',''),'-',0),
+      replace(t.$6,',',''),replace(t.$7,',',''),replace(t.$8,',',''),replace(t.$9,',',''),replace(t.$10,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Consumofinal.*[.]csv.gz') t);
+
+
+#crear tabla Centros de IMPORTACIONES
+create or replace table IMPORTACIONES(
+    YEAR VARCHAR(50),
+    IMPORTACIONES decimal(14,2));
+     
+#Copiar los datos a la tabla IMPORTACIONES 
+copy into IMPORTACIONES
+from (SELECT t.$1,replace(t.$2,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Importaciones.*[.]csv.gz') t);
+
+
+
+#crear tabla Centros de TRANSPORTE
+create or replace table TRANSPORTE(
+    YEAR NUMERIC(4,0),
+    TERRESTRE decimal(14,2),
+    MARITIMO decimal(14,2),
+    AEREO decimal(14,2));
+     
+#Copiar los datos a la tabla TRANSPORTE 
+copy into TRANSPORTE
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',',''),replace(t.$4,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Transporte.*[.]csv.gz') t);
+
+
+
+#crear tabla Centros de GENXTIPOFUENTE
+create or replace table GENXTIPOFUENTE(
+    YEAR VARCHAR(50),
+    HIDRO decimal(14,2),
+    GEOTERMICA decimal(14,2),
+    EOLICA decimal(14,2),
+    BIOMASA decimal(14,2),
+    SOLAR decimal(14,2),
+    TERMICA decimal(14,2),
+    TOTAL decimal(14,2));
+     
+#Copiar los datos a la tabla GENXTIPOFUENTE 
+copy into GENXTIPOFUENTE
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',',''),replace(t.$4,',',''),replace(t.$5,',',''),replace(t.$6,',',''),replace(t.$7,',',''),replace(t.$8,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Generacionxtipofuente.*[.]csv.gz') t);
+
+
+
+#crear tabla Centros de CONSUMOXTIPOFUENTE
+create or replace table CONSUMOXTIPOFUENTE(
+    YEAR VARCHAR(50),
+    CARBON_MINERAL decimal(14,2),
+    COQUE decimal(14,2),
+    LENHA decimal(14,2),
+    BAGAZO decimal(14,2),
+    OTROS_RES_VEG decimal(14,2),
+    CARBON_VEGETAL decimal(14,2),
+    CASC_DE_CAFE decimal(14,2),
+    BIOGAS decimal(14,2),
+    ELECTRICIDAD decimal(14,2),
+    GLP decimal(14,2),
+    GASOLINA_REGULAR decimal(14,2),
+    GASOLINA_SUPER decimal(14,2),
+    KEROSENE decimal(14,2),
+    JET_FUEL decimal(14,2),
+    AV_GAS decimal(14,2),
+    DIESEL decimal(14,2),
+    GASOLEO decimal(14,2),
+    FUEL_OIL decimal(14,2),
+    TOTAL decimal(14,2));
+     
+#Copiar los datos a la tabla CONSUMOXTIPOFUENTE 
+copy into CONSUMOXTIPOFUENTE
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',',''),replace(t.$4,',',''),replace(t.$5,',',''),replace(t.$6,',',''),replace(t.$7,',',''),replace(t.$8,',',''),
+      replace(replace(t.$9,',',''),'-',0),replace(t.$10,',',''),replace(t.$11,',',''),replace(t.$12,',',''),replace(t.$13,',',''),replace(t.$14,',',''),replace(t.$15,',',''),
+      replace(t.$16,',',''),replace(t.$17,',',''),replace(t.$18,',',''),replace(t.$19,',',''),replace(t.$20,',','')
+      FROM @datosext (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*Consumoxtipofuente.*[.]csv.gz') t);
+
+
+#TABLAS CARPETA EPI_Environmental_Performance_Index
+#crear tabla Centros de epi_indicatortla
+create or replace table epi_indicatortla(
+    TYPE VARCHAR(50),
+    ABBREVIATION VARCHAR(90),
+    VARIABLE VARCHAR(90),
+    SHORT_NAME VARCHAR(90),
+    ORDEN numeric(14,2));
+
+#Copiar los datos a la tabla epi_indicatortla
+copy into epi_indicatortla
+from (SELECT t.$1,replace(t.$2,',',''),replace(t.$3,',',''),replace(t.$4,',',''),replace(t.$5,',','')
+      FROM @epi (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*epi_indicatortla.*[.]csv.gz') t);
+
+
+
+#crear tabla Centros de epi_variableattributes
+create or replace table epi_variableattributes(
+    ABBREVIATION VARCHAR(50),
+    TYPE VARCHAR(50),
+    VARIABLE VARCHAR(90),
+    UNITS VARCHAR(90),
+    TRANSFORMACION VARCHAR(90),
+    ALPHA VARCHAR(90),
+    TARGET_GOOD VARCHAR(90),
+    TARGET_BAD VARCHAR(90),
+    MATERIALITY VARCHAR(90));
+
+#Copiar los datos a la tabla epi_variableattributes
+copy into epi_variableattributes
+from (SELECT t.$1,t.$2,t.$3,replace(replace(t.$4,'-',''),'%',''),replace(t.$5,'%',''),replace(t.$6,'%',''),
+      replace(t.$7,'%',''),replace(t.$8,'%',''),replace(t.$9,'%','')
+      FROM @epi (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*epi_variableattributes.*[.]csv.gz') t);
+
+
+#crear tabla Centros de epi_variableattributes
+create or replace table epi_variableattributes(
+    ABBREVIATION VARCHAR(50),
+    TYPE VARCHAR(50),
+    VARIABLE VARCHAR(90),
+    UNITS VARCHAR(90),
+    TRANSFORMACION VARCHAR(90),
+    ALPHA VARCHAR(90),
+    TARGET_GOOD VARCHAR(90),
+    TARGET_BAD VARCHAR(90),
+    MATERIALITY VARCHAR(90));
+
+#Copiar los datos a la tabla epi_variableattributes
+copy into epi_variableattributes
+from (SELECT t.$1,t.$2,t.$3,replace(replace(t.$4,'-',''),'%',''),replace(t.$5,'%',''),replace(t.$6,'%',''),
+      replace(t.$7,'%',''),replace(t.$8,'%',''),replace(t.$9,'%','')
+      FROM @epi (file_format => 'ENTERPRISES_FORMAT', pattern=>'.*epi_variableattributes.*[.]csv.gz') t);
+
+
+
+#crear tabla Centros de epi_results
+create or replace table epi_results(
+    CODIGO numeric(4,0),
+    iso VARCHAR(50),
+    country VARCHAR(50),
+    EPI_new numeric(4,1),
+    HLT_new numeric(4,1),
+    AIR_new numeric(4,1),
+    PMD_new numeric(4,1), 
+    HAD_new numeric(4,1), 
+    OZD_new numeric(4,1),
+    H2O_new numeric(4,1), 
+    USD_new numeric(4,1),
+    UWD_new numeric(4,1),
+    HMT_new numeric(4,1),
+    PBD_new numeric(4,1),
+    WMG_new numeric(4,1),
+    MSW_new numeric(4,1),
+    ECO_new numeric(4,1),
+    BDH_new numeric(4,1),
+    TBN_new numeric(4,1),
+    TBG_new numeric(4,1),
+    MPA_new numeric(4,1),
+    PAR_new numeric(4,1),
+    SHI_new numeric(4,1),
+    SPI_new numeric(4,1),
+    BHV_new numeric(4,1),
+    ECS_new numeric(4,1),
+    TCL_new numeric(4,1),
+    GRL_new numeric(4,1),
+    WTL_new numeric(4,1),
+    FSH_new numeric(4,1),
+    FSS_new numeric(4,1),
+    RMS_new numeric(4,1),
+    FGT_new numeric(4,1),
+    CCH_new numeric(4,1),
+    CDA_new numeric(4,1),
+    CHA_new numeric(4,1),
+    FGA_new numeric(4,1),
+    NDA_new numeric(4,1),
+    BCA_new numeric(4,1),
+    LCB_new numeric(4,1),
+    GIB_new numeric(4,1),
+    GHP_new numeric(4,1),
+    APE_new numeric(4,1),
+    SDA_new numeric(4,1),
+    NXA_new numeric(4,1),
+    AGR_new numeric(4,1),
+    SNM_new numeric(4,1),
+    WRS_new numeric(4,1),
+    WWT_new numeric(4,1),
+    EPI_change numeric(4,1),
+    HLT_change numeric(4,1),
+    AIR_change numeric(4,1),
+    PMD_change numeric(4,1),
+    HAD_change numeric(4,1),
+    OZD_change numeric(4,1), 
+    H2O_change numeric(4,1),
+    USD_change numeric(4,1),
+    UWD_change numeric(4,1),
+    HMT_change numeric(4,1),
+    PBD_change numeric(4,1),
+    WMG_change numeric(4,1),
+    MSW_change numeric(4,1),
+    ECO_change numeric(4,1),
+    BDH_change numeric(4,1),
+    TBN_change numeric(4,1),
+    TBG_change numeric(4,1),
+    MPA_change numeric(4,1),
+    PAR_change numeric(4,1),
+    SHI_change numeric(4,1),
+    SPI_change numeric(4,1),
+    BHV_change numeric(4,1),
+    ECS_change numeric(4,1),
+    TCL_change numeric(4,1), 
+    GRL_change numeric(4,1),
+    WTL_change numeric(4,1),
+    FSH_change numeric(4,1),
+    FSS_change numeric(4,1),
+    RMS_change numeric(4,1),
+    FGT_change numeric(4,1),
+    CCH_change numeric(4,1),
+    CDA_change numeric(4,1),
+    CHA_change numeric(4,1),
+    FGA_change numeric(4,1),
+    NDA_change numeric(4,1),
+    BCA_change numeric(4,1),
+    LCB_change numeric(4,1),
+    GIB_change numeric(4,1),
+    GHP_change numeric(4,1),
+    APE_change numeric(4,1),
+    SDA_change numeric(4,1),
+    NXA_change numeric(4,1),
+    AGR_change numeric(4,1),
+    SNM_change numeric(4,1),
+    WRS_change numeric(4,1),
+    WWT_change numeric(4,1),
+    EPI_rnk_new numeric(4,1),
+    HLT_rnk_new numeric(4,1), 
+    AIR_rnk_new numeric(4,1),
+    PMD_rnk_new numeric(4,1),
+    HAD_rnk_new numeric(4,1),
+    OZD_rnk_new numeric(4,1),
+    H2O_rnk_new numeric(4,1),
+    USD_rnk_new numeric(4,1),
+    UWD_rnk_new numeric(4,1),
+    HMT_rnk_new numeric(4,1),
+    PBD_rnk_new numeric(4,1),
+    WMG_rnk_new numeric(4,1),
+    MSW_rnk_new numeric(4,1),
+    ECO_rnk_new numeric(4,1),
+    BDH_rnk_new numeric(4,1),
+    TBN_rnk_new numeric(4,1),
+    TBG_rnk_new numeric(4,1),
+    MPA_rnk_new numeric(4,1),
+    PAR_rnk_new numeric(4,1),
+    SHI_rnk_new numeric(4,1),
+    SPI_rnk_new numeric(4,1),
+    BHV_rnk_new numeric(4,1),
+    ECS_rnk_new numeric(4,1),
+    TCL_rnk_new numeric(4,1),
+    GRL_rnk_new numeric(4,1),
+    WTL_rnk_new numeric(4,1),
+    FSH_rnk_new numeric(4,1),
+    FSS_rnk_new numeric(4,1),
+    RMS_rnk_new numeric(4,1),
+    FGT_rnk_new numeric(4,1),
+    CCH_rnk_new numeric(4,1),
+    CDA_rnk_new numeric(4,1),
+    CHA_rnk_new numeric(4,1),
+    FGA_rnk_new numeric(4,1),
+    NDA_rnk_new numeric(4,1),
+    BCA_rnk_new numeric(4,1),
+    LCB_rnk_new numeric(4,1),
+    GIB_rnk_new numeric(4,1),
+    GHP_rnk_new numeric(4,1),
+    APE_rnk_new numeric(4,1),
+    SDA_rnk_new numeric(4,1),
+    NXA_rnk_new numeric(4,1),
+    AGR_rnk_new numeric(4,1),
+    SNM_rnk_new numeric(4,1),
+    WRS_rnk_new numeric(4,1),
+    WWT_rnk_new numeric(4,1));
+
+#Copiar los datos a la tabla epi_RESULTS SE HIZO POR LOAD TABLE
+
+ 
+ #TABLAS DE CARPETA solar_potentoal_countryranking_2020_data
+ #crear tabla Country_indicators
+create or replace table Country_indicators(
+"ISO_A3" VARCHAR(6),
+"Country_or_region" VARCHAR(40),
+Note VARCHAR(40),
+"World_Bank_Region" VARCHAR(10),
+"Total_population_2018" NUMERIC(14,0),
+"Total_area_2018" NUMERIC(14,0),
+"Evaluated_area" NUMERIC(14,0),
+"Level_1_area(%_of_evaluated_area" NUMERIC(4,0),
+"Human_development_Index_2017" decimal(4,2),
+"Gross_domestic_product_(USD_per_capita)_2018" NUMERIC(14,0),
+"Average_theoretical_potential_(GHI_kWh/m2/day)long_term" decimal(4,2),
+"Average_practical_potential(PVOUT_Level1_kWh/kWp/day)long_term" decimal(4,2),
+"Average_economic_potential(LCOE_USD/kWh)_2018" decimal(4,2),
+"Average_PV_seasonality_index_long_term" decimal(4,2),
+"PV_equivalent_area(%_of_total_area)long_term"  decimal(6,3),
+"Cummulative_installed_PV_capacity(MWp)_2018" decimal(10,1),
+"Cummulative_installed_PV_capacity(Wp_per_capita)_2018" decimal(10,1),
+"Access_to_electricity(%_of_rural population)_2016" decimal(5,1),
+"Electric_power_consumption(kWh_per_capita)_2014" NUMERIC(6,0),
+Reliability_of_supply_and_transparency_of_tariff_index_2019 NUMERIC(2,0),
+"Approximate_Tariffs_for_SMEs(UScent/kWh)_2019" decimal(4,1));
+
+#Copiarlos datos a la tabla Country_indicators 
+copy into Country_indicators
+from (SELECT t.$1,replace(replace(t.$2,'(',''),')',''),t.$3,t.$4,replace(t.$5,',',''),replace(t.$6,',',''),replace(t.$7,',',''),
+      replace(t.$8,'%',''),t.$9,replace(t.$10,',',''),t.$11,t.$12,t.$13,t.$14,t.$15,t.$16,t.$17,t.$18,t.$19,t.$20,t.$21
+      FROM @SPCR (file_format => 'COUNTRY_SPCR', pattern=>'.*Country_indicators.*[.]csv.gz') t);
+ 
+
+ 
+ #crear tabla MONTHLY_DATA 
+create or replace table MONTHLY_DATA(
+ISO_A3 VARCHAR(5),
+Countr_or_region VARCHAR(50), 
+Note VARCHAR(50),
+World_Bank_Region VARCHAR(50),
+Yearly decimal(4,2),
+January decimal(4,2),
+February decimal(4,2),
+March decimal(4,2),
+April decimal(4,2),
+May decimal(4,2), 
+June decimal(4,2),
+July decimal(4,2),
+August decimal(4,2),
+September decimal(4,2),
+October decimal(4,2),
+November decimal(4,2),
+December decimal(4,2));
+
+
+
+
+
+#crear tabla Summary_statistics
+create or replace table Summary_statistics(
+ISO_A3 VARCHAR(4),
+Country_or_region VARCHAR(40),
+Note VARCHAR(40),
+World_Bank_Region VARCHAR(10),
+Minimum decimal(3,2),
+percentile_10 decimal(3,2),
+Percentile_25 decimal(3,2),
+Average decimal(3,2), 
+Median decimal(3,2),
+Percentile_75 decimal(3,2),
+percentile_90 decimal(3,2),
+Maximum decimal(3,2));
+
+#Copiarlos datos a la tabla  
+copy into Summary_statistics
+from (SELECT t.$1,replace(replace(t.$2,'(',''),')',''),t.$3,t.$4,t.$5,t.$6,t.$7,t.$8,t.$9,t.$10,t.$11,t.$12
+      FROM @SPCR (file_format => 'SRCP_FORMAT', pattern=>'.*Summary_statistics.*[.]csv.gz') t);
+      
+ LIST @SPCR 
